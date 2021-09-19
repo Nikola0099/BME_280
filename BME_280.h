@@ -3,6 +3,15 @@
 #include <stm32f1xx_it.h>
 #include <string.h>
 
+/*      PINOUT:
+ *      VCC -> 3.3V
+ *      GND -> GND
+ *      SCL -> B6
+ *      SDA -> B7
+ *      CSB -> 3.3V     Povezivanjem na 3.3V omogucavamo I2C protokol, u slucaju da je pulled down -> SPI
+ *      SDO -> GND      Povezivanjem na GND Slave adresa postaje 0x76, u slucaju povezivanja na 3.3V -> 0x77
+ */
+
 I2C_HandleTypeDef hi2c1;
 uint8_t SensorAddressWrite = 0x76 << 1 | 0x00;
 
@@ -67,7 +76,6 @@ void initialisation(uint8_t T_oversampling, uint8_t P_oversampling, char operati
         ctrlMeas = ctrlMeas7_5 | ctrMeas4_2 | ctrlMeas1_0;      // Kombinovanje pređašnjih vrednosti u vrednost koju je potrebno zapisati u registru
 
         uint8_t ctrlMeasSet[2] = {0xF4, ctrlMeas};              // 0xF4 - adresa registra, ctrlMeas - vrednost koju želimo upisati
-        HAL_Delay(5000);
         HAL_I2C_Master_Transmit(&hi2c1, SensorAddressWrite, ctrlMeasSet, 2, HAL_MAX_DELAY);     // Upis u registar
 
         uint8_t config4_2, config0, config;
